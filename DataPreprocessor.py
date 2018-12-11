@@ -3,6 +3,10 @@ import os
 
 
 class DataPreprocessor(object):
+    
+    
+    def __init__(self):
+        self = this.self;
 
     # 将连续的文字转换为一行一个
     def character_tagging(self, input_file, output_file):
@@ -50,6 +54,16 @@ class DataPreprocessor(object):
             output_data.write("\n")
         input_data.close()
         output_data.close()
+
+    @classmethod
+    def make_Test_Data__(input_file):
+        texts = []
+        input_data = codecs.open(input_file, 'r', 'utf-8')
+        for line in input_data.readline():
+            words = line.split()
+            texts.append(words)
+        return texts
+
 
 if __name__ == '__main__':
     data_preprocessor = DataPreprocessor()

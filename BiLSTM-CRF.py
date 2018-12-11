@@ -27,32 +27,34 @@ with tf.variable_scope("input_layer"):
 
 #  根据输入文字，创建输入矩阵
 batch_size = 100
-sentence_max_len = 50
+sentence_max_len = 150
 input_file = os.path.join('.','data','w2v_raw_char')
 input_data = codecs.open(input_file, 'r', 'utf-8').readlines()
+word_ids = tf.placeholder(tf.int32, shape=[batch_size, sentence_max_len])
+# 一个批次的数据 shape = (batch, sentence, word_vector_size)
+pretrained_embeddings = tf.nn.embedding_lookup(embedding_tf, word_ids)
 for total_line_index in range(0, len(input_data) - 1, batch_size):
     batch_data = input_data[total_line_index: total_line_index + batch_size - 1]
-    word_ids = tf.placeholder(tf.int32, shape=[batch_size, sentence_max_len])
     word_ids_list = np.zeros(shape=(batch_size, sentence_max_len))
-    for line_index, line in enumerate(input_data):
+    for line_index, line in enumerate(batch_data):
         line = line.split()
-        print(line_index)
         for char_index, char in enumerate(line):
+            print(line_index,char_index)
             char_id = char2id_dict[char]
             word_ids_list[line_index][char_index] += char_id
+    with tf.Session() as sess:
+        print(sess.run(pretrained_embeddings, feed_dict={word_ids: word_ids_list}))
 
 sequence_lengths = tf.placeholder(tf.int32, shape=[batch_size])
 # L = tf.Variable(char_model, trainable=False)
 
-# 一个批次的数据 shape = (batch, sentence, word_vector_size)
-pretrained_embeddings = tf.nn.embedding_lookup(embedding_tf, word_ids)
+
 
 # contextual training
 hidden_size = 100
 num_tags = 7
 
-with tf.Session() as sess:
-    print(sess.run(pretrained_embeddings, feed_dict={word_ids: word_ids_list}))
+
 
 cell_fw = tf.contrib.rnn.LSTMCell(hidden_size)
 cell_bw = tf.contrib.rnn.LSTMCell(hidden_size)
